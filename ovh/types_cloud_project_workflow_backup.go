@@ -1,6 +1,8 @@
 package ovh
 
 import (
+	"fmt"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ovh/terraform-provider-ovh/ovh/helpers"
 )
@@ -39,5 +41,50 @@ func (v CloudProjectWorkflowBackupResponse) ToMap() map[string]interface{} {
 	obj["id"] = v.Id
 	obj["instance_id"] = v.InstanceId
 	obj["name"] = v.Name
+	return obj
+}
+
+type CloudProjectWorkflowsBackup struct {
+	Id         string                                   `json:"id"`
+	Name       string                                   `json:"name"`
+	Cron       string                                   `json:"cron"`
+	Executions []*CloudProjectWorkflowsBackupExecutions `json:"executions"`
+	CreatedAt  string                                   `json:"createtAd"`
+	InstanceId string                                   `json:"instanceId"`
+	BackupName string                                   `json:"backupName"`
+}
+
+type CloudProjectWorkflowsBackupExecutions struct {
+	Id         string `json:"id"`
+	ExecutedAd string `json:"executedAd"`
+	State      string `json:"state"`
+	StateInfo  string `json:"stateInfo"`
+}
+
+func (u *CloudProjectWorkflowsBackup) String() string {
+	return fmt.Sprintf("Id: %v, Name: %s, Cron: %s, CreateAd: %s, InstanceId: %s, BackupName: %s", u.Id, u.Name, u.Cron, u.CreatedAt, u.InstanceId, u.BackupName)
+}
+func (e CloudProjectWorkflowsBackupExecutions) ToMap() map[string]interface{} {
+	obj := make(map[string]interface{})
+	obj["executed_ad"] = e.ExecutedAd
+	obj["id"] = e.Id
+	obj["state"] = e.State
+	obj["state_info"] = e.StateInfo
+	return obj
+}
+func (u CloudProjectWorkflowsBackup) ToMap() map[string]interface{} {
+	obj := make(map[string]interface{})
+	obj["id"] = u.Id
+	obj["name"] = u.Name
+	obj["cron"] = u.Cron
+	obj["executions"] = u.Executions
+	obj["created_at"] = u.CreatedAt
+	obj["instance_id"] = u.InstanceId
+	obj["backup_name"] = u.BackupName
+	var executions []map[string]interface{}
+	for _, e := range u.Executions {
+		executions = append(executions, e.ToMap())
+	}
+	obj["executions"] = executions
 	return obj
 }
